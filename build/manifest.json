@@ -1,16 +1,13 @@
 {
-  "manifest_version": 3,
-  "name": "AndyWallet",
-  "version": "1.0",
-  "description": "Крипто кошелёк",
-  "permissions": [
-    "tabs",
-    "storage",
-    "activeTab"
-  ],
-  "icons": {
-    "16": "./logo.jpg",
-    "48": "./logo.jpg",
-    "128": "./logo.jpg"
-  }
+  "name":"Andy Wallet",
+  "version":"1.0.0",
+  "description":"Крутой крипто кошелёк 413гр",
+  "manifest_version":3,
+  "action":{
+    "default_popup":"index.html",
+    "default_title":"Open Source Wallet"
+  },
+  "permissions":[
+    "storage"
+  ]
 }
