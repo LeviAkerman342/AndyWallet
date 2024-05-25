@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUserProfile } from '../actions';
 import { useSelector } from 'react-redux';
-import { ethers } from "ethers";
+import { ethers, Wallet } from "ethers"; // Импорт ethers и Wallet
 import { Button, Input, Card, Upload, message } from "antd";
 import { ExclamationCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import WalletView from "../WalletView/WalletView";
+import axios from 'axios';
 
 export default function CreateAccount({ setWallet, setSeedPhrase }) {
     const [newSeedPhrase, setNewSeedPhrase] = useState(null);
@@ -19,17 +20,29 @@ export default function CreateAccount({ setWallet, setSeedPhrase }) {
     const selectedChain = useSelector(state => state.selectedChain);
 
     function generateWallet() {
-        const mnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
+        const mnemonic = Wallet.createRandom().mnemonic.phrase;
         setNewSeedPhrase(mnemonic);
         console.log(mnemonic);
     }
-    function setWalletAndMneomic() {
+
+    async function setWalletAndMnemonic() {
         setSeedPhrase(newSeedPhrase);
-        setWallet(ethers.Wallet.fromPhrase(newSeedPhrase).address);
+        const walletInstance = ethers.Wallet.fromPhrase(newSeedPhrase); // Использование правильного метода
+        const walletAddress = walletInstance.address;
+        setWallet(walletAddress);
         dispatch(setUserProfile({ email, firstName, lastName }));
+
+        // Отправка запроса на регистрацию
+        try {
+            const response = await axios.post("http://localhost:3001/register", { email, firstName, lastName });
+            const { user } = response.data;
+            // setBalance(user.balance); // Установка начального баланса (если нужно)
+        } catch (error) {
+            console.error("Ошибка регистрации:", error);
+        }
+
         setNavigate(true);
     }
-
 
     const handleUpload = (file) => {
         if (file.size > 2 * 1024 * 1024) {
@@ -87,7 +100,7 @@ export default function CreateAccount({ setWallet, setSeedPhrase }) {
                 <Button
                     className="frontPageButton"
                     type="default"
-                    onClick={() => setWalletAndMneomic()}
+                    onClick={() => setWalletAndMnemonic()}
                 >
                     Открыть новый кошелёк
                 </Button>
@@ -104,7 +117,6 @@ export default function CreateAccount({ setWallet, setSeedPhrase }) {
                 <p className="frontPageBottom" onClick={() => navigate("/")}>
                     Вернуться назад
                 </p>
-
             </div>
         </>
     );
